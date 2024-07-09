@@ -1,6 +1,4 @@
 
-
-
 // CASOS DE USO
 
 //adicionar item no carrinho
@@ -17,22 +15,35 @@ async function deleteItem (userCart, name) {
     }
 }
 
-//remover um item
-async function removeItem (userCart, index) {
+//remover um item / subtrair um item
+async function removeItem (userCart, item) {
 
-    //transforma o indice visual do usuario para o indice do backend
-    const deleteIndex = index - 1;
+    //encontrar o indice do item
+    const indexFound = userCart.findIndex((p) => p.name === item.name);
     
-    // é maior do que 0 e se é menor do que o tamanho do carrinho
-    if (index >= 0 && index < userCart.lenght) {
-        userCart.splice(deleteIndex, 1, "");
+    //caso não encontre o item
+    if (indexFound == -1) {
+        console.log("Item não encontrado");
+        return;
+    }
+
+    //caso quantidade de item seja maior que 1, subtrair 1
+    if (userCart[indexFound].quantity > 1) {
+        userCart[indexFound].quantity -= 1;
+        return;
+    }
+
+    //caso quantidade de item seja igual a 1, deletar o item
+    if (userCart[indexFound].quantity == 1) {
+        deleteItem(userCart, userCart[indexFound].name);
+        return;
     }
 }
 
 //calcular o total
 async function calculateTotal (userCart) {
     console.log("\nShopee Cart Total is:");
-    const result = userCart.reduce((total, item) => total + item.subtotal(), 0);
+    const result = userCart.reduce((total, item) => total + (item.quantity) * (item.price), 0);
     console.log("🛒 R$ " + result.toFixed(2))
 }
 
@@ -40,7 +51,7 @@ async function calculateTotal (userCart) {
 async function displayCart (userCart) {
     console.log("\nShopee cart list:");
     userCart.forEach((item, index) => {
-        console.log(`${index + 1}. ${item.name} - R$ ${item.price} | ${item.quantity}x | Subtotal: R$ ${item.subtotal()}`);
+        console.log(`${index + 1}. ${item.name} - R$ ${item.price} | ${item.quantity}x | Subtotal: R$ ${(item.price) * (item.quantity)}`);
     });
 }
 
